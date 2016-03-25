@@ -1,20 +1,12 @@
 <?php
 
 /**
-* Mrush Fan copy
+* Mrush Fun copy
 * @author Alex Priadko
 */
 
 
-$start_time = microtime();
-
-// разделяем секунды и миллисекунды (становятся значениями начальных ключей массива-списка)
-
-$start_array = explode(" ",$start_time);
-
-// это и есть стартовое время
-
-$start_time = $start_array[1] + $start_array[0]; 
+$start_time = microtime(true);
 
 
 ob_start();
@@ -22,13 +14,7 @@ session_start();
 
 
 
-$config = array ('dbhost'=>'localhost',
-				 'dbname'=>'moon',
-				 'dbpass'=>'',
-				 'dbuser'=>'root',
-				 'time'=>$_SERVER['REQUEST_TIME'],
-				 'root'=>$_SERVER['DOCUMENT_ROOT']
-				 );
+$config = require __DIR__ . '/data/config.php';
 
 function __autoload($file)
 {
@@ -97,13 +83,7 @@ if ($user)
 
 	$updateUsersOnline = $db->query($sqlOnline,$plaseholdersOnline);
 
-
-	$expLevel = array (0,150,150,300,450,600,800,
-					1000,1200,1560,3030,4580,
-					7130,10720,16860,26560,
-					40310,64770,101189,158830,
-					252000);
-
+    $expLevel = require __DIR__ . '/data/exp.php';
 
 }
 
@@ -111,7 +91,7 @@ if ($user)
 
 ////including header main
 
-include_once 'headermain.php';
+include_once __DIR__ . '/headermain.php';
 
 //////////////////
 

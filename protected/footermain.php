@@ -98,18 +98,5 @@ else
 	<?
 }
 
-$end_time = microtime();
-
-$end_array = explode(" ",$end_time);
-
-$end_time = $end_array[1] + $end_array[0];
-
-// вычитаем из конечного времени начальное
-
-$time = $end_time - $start_time;
-
-$time = substr($time, 0,4);
-
-// выводим в выходной поток (броузер) время генерации страницы
-
-printf("Страница сгенерирована за %f секунд",$time); 
+?>
+<center> <?php echo substr((microtime(true) - $start_time),0,5);?> </center>
