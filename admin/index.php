@@ -11,7 +11,7 @@ if (!$user OR $user['access']!='3')
 }
 
 ?>
-
+<a class="mbtn mb2" href ='/admin/dev_news'/><font color = "green">Новости разработки</font> </a>
 <a class="mbtn mb2" href ='/admin/ban'/>Баны </a>
 <?
 
