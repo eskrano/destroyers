@@ -9,6 +9,17 @@ if (!$user)
 	exit;
 }
 
+$has_users = $db->rows("SELECT `id` FROM `users` WHERE `id` != ?",[
+   $user['id'] 
+]);
+
+if ($has_users == 0) {
+    $_SESSION['error'] = 'Нет доступных противников!';
+    header("Location:/");
+    exit;
+}
+
+
 if ($user['fights'] == 0 && $user['fights_reset'] > $config['time'])
 {
 	$tt = $user['fights_reset'] - time();
