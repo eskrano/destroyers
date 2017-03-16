@@ -14,7 +14,13 @@ session_start();
 
 
 
-$config = require __DIR__ . '/data/config.php';
+$config = __DIR__ . '/data/config.php';
+
+if (! file_exists($config)) {
+    throw new Exception("Game not installed. Read install instructions from Readme.md");
+}
+
+$config = require_once $config;
 
 function __autoload($file)
 {

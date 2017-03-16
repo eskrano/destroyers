@@ -2,7 +2,7 @@
 
 return [
     'dbhost' => 'localhost',
-    'dbname' => 'game.dev',
+    'dbname' => 'destroyers',
     'dbpass' => '',
     'dbuser' => 'root',
     'time' => time(),

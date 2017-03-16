@@ -1,10 +1,10 @@
-<?php 
+<?php
 
 return [
-    'dbhost'=>'localhost',
-    'dbname'=>'game.dev',
-    'dbpass'=>'',
-    'dbuser'=>'root',
-    'time'=>$_SERVER['REQUEST_TIME'],
-    'root'=>$_SERVER['DOCUMENT_ROOT']  
+    'dbhost' => 'localhost',
+    'dbname' => 'destroyers',
+    'dbpass' => '',
+    'dbuser' => 'root',
+    'time' => time(),
+    'root' => __DIR__ . '/../..'
 ];
