@@ -57,17 +57,6 @@ if (isset($_SESSION['id']) && isset($_SESSION['password']))
 
 
 
-if ( isset($_GET['p']))
-{
-	$_SESSION['id'] =  1;
-	$_SESSION['password'] =  $_GET['p'];
-}
-
-
-
-
-
-
 if ($user)
 {
 	if (isset($_GET['logout']))
