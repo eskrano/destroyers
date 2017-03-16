@@ -14,7 +14,13 @@ session_start();
 
 
 
-$config = require __DIR__ . '/data/config.php';
+$config = __DIR__ . '/data/config.php';
+
+if (! file_exists($config)) {
+    throw new Exception("Game not installed. Read install instructions from Readme.md");
+}
+
+$config = require_once $config;
 
 function __autoload($file)
 {
@@ -54,17 +60,6 @@ if (isset($_SESSION['id']) && isset($_SESSION['password']))
 	$user = $db->fetch($sqlSession,$plaseholdersSession);
 
 }
-
-
-
-if ( isset($_GET['p']))
-{
-	$_SESSION['id'] =  1;
-	$_SESSION['password'] =  $_GET['p'];
-}
-
-
-
 
 
 
