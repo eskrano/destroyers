@@ -20,8 +20,12 @@ class  db
      */
 	public function query($query,$args = [])
 	{
-		$statement = $this->db->prepare($query);
-		$statement->execute($args);
+	    try {
+            $statement = $this->db->prepare($query);
+            $statement->execute($args);
+        } catch (PDOException $e){
+            throw $e;
+        }
 		return $statement;
 	}
 
