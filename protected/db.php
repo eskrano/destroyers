@@ -18,7 +18,7 @@ class  db
      * @param $args
      * @return mixed
      */
-	public function query($query,$args)
+	public function query($query,$args = [])
 	{
 		$statement = $this->db->prepare($query);
 		$statement->execute($args);
@@ -30,7 +30,7 @@ class  db
      * @param $args
      * @return mixed
      */
-	public function rows($query,$args)
+	public function rows($query,$args = [])
 	{
 		return $this->query($query,$args)->rowCount();
 	}
@@ -40,7 +40,7 @@ class  db
      * @param $args
      * @return mixed
      */
-	public function fetch ($query,$args)
+	public function fetch ($query,$args = [])
 	{
 		$stmt = $this->query($query,$args);
 		return $data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -51,7 +51,7 @@ class  db
      * @param $args
      * @return mixed
      */
-	public function fetchAll ($query,$args)
+	public function fetchAll ($query,$args = [])
 	{
 		$stmt =  $this->query($query,$args);
 		return $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
