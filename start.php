@@ -16,7 +16,7 @@ if (isset($_GET['attack'])) {
 
         $_SESSION['id'] = $db->last();
         $_SESSION['password'] =& $passwordNewUs;
-        exit(var_dump($_SESSION));
+
         header("Location:/");
         exit;
     }
