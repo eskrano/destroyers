@@ -19,7 +19,7 @@ php_flag magic_quotes_runtime Off
 php_flag magic_quotes_sybase Off
 # Не создаются переменные argc и argv
 php_flag register_argc_argv Off
-# Session
-php_value session.auto_start 1
+
 Options -Indexes
 AddDefaultCharset UTF-8
+php_value short_open_tag 1

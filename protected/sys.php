@@ -1,87 +1,110 @@
 <?php
-
+ob_start();
+session_start();
 /**
-* Mrush Fun copy
-* @author Alex Priadko
-*/
+ * Mrush Fun copy
+ * @author Alex Priadko
+ */
 
 
 $start_time = microtime(true);
 
-
-ob_start();
-session_start();
-
-
-
 $config = __DIR__ . '/data/config.php';
 
-if (! file_exists($config)) {
+if (!file_exists($config)) {
     throw new Exception("Game not installed. Read install instructions from Readme.md");
 }
 
 $config = require_once $config;
 
+// others
+
+require_once __DIR__ . '/other/filedb.php';
+
+$fDb = new filedb();
+$fDb->setPath(__DIR__ . '/filedb');
+
+
+function post($key, $default = false) {
+    if (isset($_POST[$key])) {
+        return $_POST[$key];
+    }
+    return $default;
+}
+
+function loadModel($name, $db)
+{
+    $pathModels = __DIR__ . '/models';
+    $mPath = sprintf("%s/%s.php", $pathModels, $name);
+
+    if (!file_exists($mPath)) {
+        throw new Exception("Model not found");
+    }
+
+    require $mPath;
+
+    if (!class_exists($cName = sprintf("model%s", ucfirst($name)))) {
+        throw new Exception("Model class not found");
+    }
+
+    return new $cName($db);
+}
+
 function __autoload($file)
 {
-	global $config;
-	$path = $config['root'].'/protected/'.$file.'.php';
+    global $config;
+    $path = $config['root'] . '/protected/' . $file . '.php';
 
-	if (file_exists($path))
-	{
-		include_once $path;
-	}
-	else
-	{
-		die ('Class '.$file.' not found! ');
-	}
+    if (file_exists($path)) {
+        include_once $path;
+    } else {
+        die ('Class ' . $file . ' not found! ');
+    }
 }
 
-$database1 = new PDO('mysql:host='.$config['dbhost'].';dbname='.$config['dbname'].'', 
-				$config['dbuser'], $config['dbpass']);
-
+try {
+    $database1 = new PDO('mysql:host=' . $config['dbhost'] . ';dbname=' . $config['dbname'] . '',
+        $config['dbuser'], $config['dbpass']);
+} catch (PDOException $e) {
+    throw $e;
+}
 $db = new db($database1);
+$db->noPrepared("SET sql_mode = ''");
 
-if (isset($_SESSION['id']) && isset($_SESSION['password']))
-{
-	$sqlSession = "SELECT * FROM `users` WHERE `id`=? and `password`=? LIMIT 1";
-	$plaseholdersSession = array ($_SESSION['id'], $_SESSION['password']);
+if (isset($_SESSION['id']) && isset($_SESSION['password'])) {
+    $sqlSession = "SELECT * FROM `users` WHERE `id`=? and `password`=? LIMIT 1";
+    $plaseholdersSession = array($_SESSION['id'], $_SESSION['password']);
 
-	$rowsSession = $db->rows($sqlSession,$plaseholdersSession);
+    $rowsSession = $db->rows($sqlSession, $plaseholdersSession);
 
-	if ($rowsSession == 0)
-	{
-		$_SESSION['id'] = null;
-		$_SESSION['password'] =  null;
-		header("Location:/");
-		exit;
-	}
+    if ($rowsSession == 0) {
+        $_SESSION['id'] = null;
+        $_SESSION['password'] = null;
+        header("Location:/");
+        exit;
+    }
 
-	$user = $db->fetch($sqlSession,$plaseholdersSession);
+    $user = $db->fetch($sqlSession, $plaseholdersSession);
 
 }
 
 
+if (isset($user)) {
+    if (isset($_GET['logout'])) {
+        $_SESSION['id'] = null;
+        $_SESSION['password'] = null;
+        header("Location:/");
+        exit;
+    }
 
-if ($user)
-{
-	if (isset($_GET['logout']))
-	{
-		$_SESSION['id'] =  null;
-		$_SESSION['password'] =  null;
-		header("Location:/");
-		exit;
-	}
+    $sqlOnline = "UPDATE `users` SET `online`=? WHERE `id`=?";
+    $plaseholdersOnline = array($config['time'], $user['id']);
 
-	$sqlOnline = "UPDATE `users` SET `online`=? WHERE `id`=?";
-	$plaseholdersOnline = array ($config['time'],$user['id']);
-
-	$updateUsersOnline = $db->query($sqlOnline,$plaseholdersOnline);
+    $updateUsersOnline = $db->query($sqlOnline, $plaseholdersOnline);
 
     $expLevel = require __DIR__ . '/data/exp.php';
 
 }
-
 
 
 ////including header main
@@ -91,34 +114,30 @@ include_once __DIR__ . '/headermain.php';
 //////////////////
 
 
-
-if (isset($user))
-{
+if (isset($user)) {
 
 
-	if ($user['fights'] == 0 && $user['fights_reset'] < $config['time'])
-{
-	$updFights = $db->query("UPDATE `users` SET `fights`='15',`fights_reset`='0'
+    if ($user['fights'] == 0 && $user['fights_reset'] < $config['time']) {
+        $updFights = $db->query("UPDATE `users` SET `fights`='15',`fights_reset`='0'
 							WHERE `id`=?",
-							array($user['id']));
-	$_SESSION['info'] = 'Ваши бои на арене восстановлены! Можете продолжить сражения!';
-}
+            array($user['id']));
+        $_SESSION['info'] = 'Ваши бои на арене восстановлены! Можете продолжить сражения!';
+    }
 
-	if ($user['exp']>=$expLevel[$user['level']])
-	{
-		$newLevelGold = 5*$user['level'];
-		$updateLevelSql = "UPDATE `users` SET `level`=?,`exp`='0',`gold`=?
+    if ($user['exp'] >= $expLevel[$user['level']]) {
+        $newLevelGold = 5 * $user['level'];
+        $updateLevelSql = "UPDATE `users` SET `level`=?,`exp`='0',`gold`=?
 						   WHERE `id`=?";
 
-		$updateLevelPl = array($user['level']+1,$user['gold']+$newLevelGold,
-								$user['id']);
+        $updateLevelPl = array($user['level'] + 1, $user['gold'] + $newLevelGold,
+            $user['id']);
 
-		$updateLevelQuery = $db->query($updateLevelSql,$updateLevelPl);
-		?>
+        $updateLevelQuery = $db->query($updateLevelSql, $updateLevelPl);
+        ?>
 
-		<div class="bntf">
-			<div class="nl">
-				<div class="nr cntr lyell lh1 p5 sh">
+        <div class="bntf">
+            <div class="nl">
+                <div class="nr cntr lyell lh1 p5 sh">
 					<span class="win">
 						<b>
 							Вы получили новый уровень!
@@ -128,24 +147,19 @@ if (isset($user))
 							5
 						</b>
 					</span>
-					<br>
-				</div>
-			</div>
-		</div>
+                    <br>
+                </div>
+            </div>
+        </div>
 
-		<?
-	}
-
-
+        <?
+    }
 
 
 }
 
 
-
-
-if ($paginate == 1)
-{
-	include_once 'page.php';
+if (isset($paginate) && $paginate === 1) {
+    include_once 'page.php';
 }
 
